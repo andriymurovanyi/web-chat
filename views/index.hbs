@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">WebChat</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="/support">Support</a>
+            <a class="p-2 text-dark" href="/contacts">Contact us</a>
+        </nav>
+        <a class="btn btn-success mr-1" href="/login">Sign in</a>
+        <a class="btn btn-outline-primary" href="/register">Sign up</a>
+
+    </div>
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-5">
+                <div class="col border">
+                    <h3 class="text-center">Chat</h3>
+                    <hr>
+                    <div id="all_messages">
+                        <p class="text-center ml-4 lead" id="one">Messages will be here</p>
+                    </div>
+                </div>
+
+                <form action="" id="main_form">
+                    <br>
+                    <label class="lead" >
+                        Input your nickname
+                        <input type="text" id="name" class="form-control">
+                    </label>
+                    <br>
+                    <label for="message">New message</label>
+                    <textarea name="message" id="message" class="form-control"
+                              placeholder="Type here..." cols="20"></textarea>
+                    <br>
+                    <input type="submit" value="Send" class="btn btn-danger">
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let min = 1;
+        let max = 6;
+        let random_number = Math.floor(Math.random() * (max - min)) + min;
+
+        let style;
+
+        switch (random_number){
+            case 1: style = "secondary"; break;
+            case 2: style = "danger"; break;
+            case 3: style = "success"; break;
+            case 4: style = "warning"; break;
+            case 5: style = "info"; break;
+            case 6: style = "light"; break;
+        }
+
+        $(function () {
+            let socket = io.connect();
+            let $form = $("#main_form");
+            let $textarea = $("#message");
+            let $all_messages = $("#all_messages");
+            let $name = $("#name");
+            $form.submit(function (e) {
+                e.preventDefault();
+                socket.emit('sendMessage', {
+                    from: $name.val(),
+                    message: $textarea.val(),
+                    style: style
+                });
+                $textarea.val("");
+            });
+            socket.on("addMessage", function (data) {
+                $all_messages.append(`<div class='alert alert-${data.style}'><b>${data.from}</b>: ${data.message}</div>`);
+                $("#one").remove();
+            })
+        });
+    </script>
+</body>
+</html>
