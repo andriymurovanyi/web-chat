@@ -10,8 +10,6 @@ const router = new Router();
 const server = require("http").createServer(app.callback());
 const io = require("socket.io")(server);
 
-
-
 app.use(serve(__dirname + "/public"));
 app.use(hbs(__dirname , {
   partialDirs: __dirname + '/views'
@@ -28,7 +26,6 @@ io.on("connection", function (socket) {
   console.log("Connection successful!");
   connections.push(socket);
 
-
   socket.on("disconnect", function(data) {
     connections.splice(connections.indexOf(socket), 1);
     console.log("Disconnected!");
@@ -42,9 +39,6 @@ io.on("connection", function (socket) {
     });
   })
 });
-
-console.log(connections);
-
 
 app
     .use(router.routes())
